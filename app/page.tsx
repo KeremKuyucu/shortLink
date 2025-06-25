@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from "@/lib/firebase"
-import { signInWithGoogle } from "@/lib/auth"
+import { signInWithGoogle, checkUserPermission } from "@/lib/auth"
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,22 +11,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { generateShortCode, isValidUrl } from "@/lib/utils"
-import { Copy, LinkIcon, Loader2, Github, Shield, Zap, Code } from "lucide-react"
+import { Copy, LinkIcon, Loader2, Github, Shield, Zap, Code, Ban } from "lucide-react"
 import Link from "next/link"
 import { APIShowcase } from "@/components/api-showcase"
 import { QuickStats } from "@/components/quick-stats"
+import { useEffect } from "react"
 
 export default function HomePage() {
   const [user, loading] = useAuthState(auth)
   const [url, setUrl] = useState("")
   const [shortUrl, setShortUrl] = useState("")
   const [isShortening, setIsShortening] = useState(false)
+  const [userPermission, setUserPermission] = useState<boolean | null>(null)
   const { toast } = useToast()
 
   const [customUrl, setCustomUrl] = useState("")
   const [useCustomUrl, setUseCustomUrl] = useState(false)
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false)
   const [customUrlError, setCustomUrlError] = useState("")
+
+  // Kullanıcı izinlerini kontrol et
+  useEffect(() => {
+    if (user) {
+      checkUserPermission(user.uid).then(setUserPermission)
+    } else {
+      setUserPermission(null)
+    }
+  }, [user])
 
   const handleSignIn = async () => {
     try {
@@ -72,6 +83,16 @@ export default function HomePage() {
       toast({
         title: "Hata!",
         description: "URL kısaltmak için giriş yapmalısınız.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Ban kontrolü
+    if (userPermission === false) {
+      toast({
+        title: "Erişim Engellendi!",
+        description: "Hesabınız askıya alınmış durumda. URL kısaltamazsınız.",
         variant: "destructive",
       })
       return
@@ -140,7 +161,7 @@ export default function HomePage() {
 
       await addDoc(collection(db, "links"), linkData)
 
-      const fullShortUrl = `https://kisalink.icu/${shortCode}`
+      const fullShortUrl = `${window.location.origin}/${shortCode}`
       setShortUrl(fullShortUrl)
 
       // Form'u temizle
@@ -156,7 +177,7 @@ export default function HomePage() {
       console.error("Error shortening URL:", error)
       toast({
         title: "Hata!",
-        description: "URL kısaltılırken bir hata oluştu.",
+        description: "URL kısaltılırken bir hata oluştu. Hesabınız askıya alınmış olabilir.",
         variant: "destructive",
       })
     } finally {
@@ -213,6 +234,32 @@ export default function HomePage() {
     )
   }
 
+  // Banlı kullanıcı kontrolü
+  if (user && userPermission === false) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Ban className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Erişim Engellendi</h3>
+                <p className="text-sm text-gray-600 mt-1">
+                  Hesabınız askıya alınmış durumda. Lütfen destek ekibi ile iletişime geçin.
+                </p>
+              </div>
+              <Button onClick={() => auth.signOut()} variant="outline" className="w-full">
+                Çıkış Yap
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -234,7 +281,7 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">kısaLink</span>
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LinkKısa</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-6">
@@ -243,7 +290,7 @@ export default function HomePage() {
 
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <Link
-              href="https://github.com/KeremKuyucu/shortLink"
+              href="https://github.com/keremkk/link-shortener"
               target="_blank"
               className="flex items-center gap-2 hover:text-foreground transition-colors"
             >
@@ -320,7 +367,7 @@ export default function HomePage() {
         </div>
 
         {/* Quick Stats */}
-        {user && (
+        {user && userPermission !== false && (
           <div className="max-w-2xl mx-auto mb-12">
             <QuickStats />
           </div>
@@ -359,7 +406,7 @@ export default function HomePage() {
               </Button>
             </CardContent>
           </Card>
-        ) : (
+        ) : userPermission !== false ? (
           <div className="space-y-6 max-w-2xl mx-auto">
             <Card>
               <CardHeader>
@@ -404,7 +451,7 @@ export default function HomePage() {
                   {useCustomUrl && (
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-muted-foreground">https://kisalink.icu/</span>
+                        <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
                         <Input
                           type="text"
                           placeholder="ozel-url"
@@ -449,15 +496,15 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-        )}
+        ) : null}
 
         {/* API Showcase */}
-        {user && (
+        {user && userPermission !== false && (
           <div className="max-w-4xl mx-auto mb-12">
             <APIShowcase />
           </div>
         )}
-
+        
       </div>
     </div>
   )

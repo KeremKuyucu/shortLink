@@ -22,31 +22,55 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
     }
     
-    // Helper function to check user status
-    function isUserAllowed() {
+    // Helper function to check if user is not banned
+    function isUserNotBanned() {
       let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
-      return userDoc != null && 
-             (userDoc.data.isApproved == true || userDoc.data.isApproved == null) &&
-             userDoc.data.isBanned != true;
+      return userDoc != null && userDoc.data.isBanned != true;
     }
     
-    // Links collection - authenticated users can access
+    // Links collection - sadece banlı olmayan kullanıcılar
     match /links/{linkId} {
-      allow read, write, list: if request.auth != null;
+      // Banlı olmayan kullanıcılar link oluşturabilir
+      allow create: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isUserNotBanned();
+      
+      // Kendi linklerini okuyabilir
       allow read: if request.auth != null && 
         resource.data.createdBy == request.auth.uid;
+      
+      // Kendi linklerini güncelleyebilir (sadece banlı değilse)
+      allow update: if request.auth != null && 
+        resource.data.createdBy == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isUserNotBanned();
+      
+      // Kendi linklerini silebilir (sadece banlı değilse)
+      allow delete: if request.auth != null && 
+        resource.data.createdBy == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isUserNotBanned();
+      
+      // Kendi linklerini listeleyebilir
+      allow list: if request.auth != null;
     }
     
-    // API Tokens collection - sadece token sahibi erişebilir
+    // API Tokens collection - sadece banlı olmayan kullanıcılar
     match /apiTokens/{tokenId} {
       allow read, write: if request.auth != null && 
-        resource.data.userId == request.auth.uid;
+        resource.data.userId == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isUserNotBanned();
       
       allow create: if request.auth != null && 
-        request.resource.data.userId == request.auth.uid;
+        request.resource.data.userId == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isUserNotBanned();
         
-      // Collection query için list permission
-      allow list: if request.auth != null;
+      // Collection query için list permission (sadece banlı değilse)
+      allow list: if request.auth != null &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isUserNotBanned();
     }
     
     // Public read için links (redirect için)

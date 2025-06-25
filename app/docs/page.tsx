@@ -191,7 +191,7 @@ export default function APIDocsPage() {
             <Code className="h-8 w-8 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold">LinkKısa API</h1>
+            <h1 className="text-4xl font-bold">kısaLink API</h1>
             <p className="text-xl text-muted-foreground">RESTful API Dokümantasyonu</p>
           </div>
         </div>
