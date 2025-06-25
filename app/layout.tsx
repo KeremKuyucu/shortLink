@@ -10,22 +10,17 @@ import { FirebaseErrorBoundary } from "@/components/firebase-error-boundary"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "LinkKısa - URL Kısaltma Servisi",
+  title: "kısaLink - URL Kısaltma Servisi",
   description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
   keywords: ["url kısaltma", "link kısaltma", "açık kaynak", "ücretsiz", "güvenli"],
   authors: [{ name: "Kerem Kuyucu", url: "https://keremkk.com.tr" }],
   openGraph: {
-    title: "LinkKısa - Açık Kaynak URL Kısaltma Servisi",
+    title: "kısaLink - Açık Kaynak URL Kısaltma Servisi",
     description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
     type: "website",
     locale: "tr_TR",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "LinkKısa - Açık Kaynak URL Kısaltma Servisi",
-    description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
-  },
-    generator: 'v0.dev'
+  generator: 'with v0.dev'
 }
 
 export default function RootLayout({

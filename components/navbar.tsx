@@ -27,7 +27,7 @@ export function Navbar() {
       <div className="container flex h-14 items-center">
         <NextLink href="/" className="flex items-center space-x-2">
           <Link className="h-6 w-6" />
-          <span className="font-bold">LinkKısa</span>
+          <span className="font-bold">kısaLink</span>
         </NextLink>
 
         <div className="ml-auto flex items-center space-x-4">
