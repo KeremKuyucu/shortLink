@@ -14,12 +14,12 @@ export const metadata: Metadata = {
   icons: {
     icon: "/image.png",
   },
-  description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
+  description: "Basit URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
   keywords: ["url kısaltma", "link kısaltma", "açık kaynak", "ücretsiz", "güvenli"],
   authors: [{ name: "Kerem Kuyucu", url: "https://keremkk.com.tr" }],
   openGraph: {
     title: "kısaLink - Açık Kaynak URL Kısaltma Servisi",
-    description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
+    description: "Basit URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
     type: "website",
     locale: "tr_TR",
   },
