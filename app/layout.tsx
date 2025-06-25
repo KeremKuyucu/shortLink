@@ -11,6 +11,9 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "kısaLink - URL Kısaltma Servisi",
+  icons: {
+    icon: "/image.png",
+  },
   description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
   keywords: ["url kısaltma", "link kısaltma", "açık kaynak", "ücretsiz", "güvenli"],
   authors: [{ name: "Kerem Kuyucu", url: "https://keremkk.com.tr" }],
