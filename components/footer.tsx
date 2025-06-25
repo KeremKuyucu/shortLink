@@ -10,13 +10,13 @@ export function Footer() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Code className="h-4 w-4" />
             <span>
-              Bu proje <span className="font-medium text-foreground">açık kaynak</span> kodludur
+              Bu proje açık kaynak kodludur
             </span>
           </div>
 
           {/* Orta - Copyright */}
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <span>© 2024 LinkKısa</span>
+            <span>© 2025 kısaLink</span>
             <span>•</span>
             <span className="flex items-center gap-1">
               Made with <Heart className="h-3 w-3 text-red-500 fill-current" /> by Kerem Kuyucu
