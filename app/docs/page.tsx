@@ -256,7 +256,7 @@ export default function APIDocsPage() {
               <h3 className="font-medium mb-2">3. Entegre Et</h3>
               <p className="text-sm text-muted-foreground mb-3">Uygulamanıza entegre edin</p>
               <Button asChild size="sm" variant="outline">
-                <Link href="https://github.com/keremkk/link-shortener/wiki/API" target="_blank">
+                <Link href="https://github.com/keremkk/shortLink/wiki/API" target="_blank">
                   GitHub Wiki
                 </Link>
               </Button>
@@ -608,7 +608,7 @@ export default function APIDocsPage() {
               <h4 className="font-medium mb-2">GitHub</h4>
               <p className="text-sm text-muted-foreground mb-3">Kaynak kod ve issue'lar</p>
               <Button asChild size="sm" variant="outline">
-                <Link href="https://github.com/keremkk/link-shortener" target="_blank">
+                <Link href="https://github.com/keremkk/shortLink" target="_blank">
                   GitHub'da Görüntüle
                 </Link>
               </Button>
@@ -621,7 +621,7 @@ export default function APIDocsPage() {
               <h4 className="font-medium mb-2">Wiki</h4>
               <p className="text-sm text-muted-foreground mb-3">Detaylı dokümantasyon</p>
               <Button asChild size="sm" variant="outline">
-                <Link href="https://github.com/keremkk/link-shortener/wiki" target="_blank">
+                <Link href="https://github.com/keremkk/shortLink/wiki" target="_blank">
                   Wiki'yi Ziyaret Et
                 </Link>
               </Button>
