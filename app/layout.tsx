@@ -12,7 +12,8 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "kısaLink - URL Kısaltma Servisi",
   icons: {
-    icon: "/image.png",
+    icon: "/image.ico",
+    apple: "/image.png", // iOS uyumluluğu için
   },
   description: "Basit URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
   keywords: ["url kısaltma", "link kısaltma", "açık kaynak", "ücretsiz", "güvenli"],
@@ -33,6 +34,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
+      <head>
+        <link rel="icon" href="/image.png" type="image/png" />
+        <meta name="theme-color" content="#4338ca" />
+      </head>
       <body className={`${inter.className} min-h-screen flex flex-col`}>
         <FirebaseErrorBoundary>
           <Navbar />
