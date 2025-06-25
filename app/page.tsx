@@ -8,9 +8,14 @@ import { collection, addDoc, query, where, getDocs } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { generateShortCode, isValidUrl } from "@/lib/utils"
-import { Copy, LinkIcon, Loader2 } from "lucide-react"
+import { sendDiscordBotMessage, createNewLinkEmbed } from "@/lib/discord"
+import { Copy, LinkIcon, Loader2, Github, Shield, Zap, Code } from "lucide-react"
+import Link from "next/link"
+import { APIShowcase } from "@/components/api-showcase"
+import { QuickStats } from "@/components/quick-stats"
 
 export default function HomePage() {
   const [user, loading] = useAuthState(auth)
@@ -18,6 +23,11 @@ export default function HomePage() {
   const [shortUrl, setShortUrl] = useState("")
   const [isShortening, setIsShortening] = useState(false)
   const { toast } = useToast()
+
+  const [customUrl, setCustomUrl] = useState("")
+  const [useCustomUrl, setUseCustomUrl] = useState(false)
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState(false)
+  const [customUrlError, setCustomUrlError] = useState("")
 
   const handleSignIn = async () => {
     try {
@@ -33,6 +43,11 @@ export default function HomePage() {
         variant: "destructive",
       })
     }
+  }
+
+  const isValidCustomUrl = (url: string) => {
+    const regex = /^[a-z0-9\-_]{3,20}$/
+    return regex.test(url)
   }
 
   const handleShortenUrl = async () => {
@@ -63,33 +78,85 @@ export default function HomePage() {
       return
     }
 
+    // Özel URL validasyonu
+    if (useCustomUrl) {
+      if (!customUrl.trim()) {
+        toast({
+          title: "Hata!",
+          description: "Özel URL girin veya otomatik oluşturma seçeneğini seçin.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (!isValidCustomUrl(customUrl)) {
+        toast({
+          title: "Hata!",
+          description:
+            "Özel URL sadece harf, rakam, tire (-) ve alt çizgi (_) içerebilir. 3-20 karakter arası olmalıdır.",
+          variant: "destructive",
+        })
+        return
+      }
+    }
+
     setIsShortening(true)
 
     try {
-      let shortCode = generateShortCode()
+      let shortCode = useCustomUrl ? customUrl.toLowerCase() : generateShortCode()
 
       // Benzersiz kod kontrolü
       const existingQuery = query(collection(db, "links"), where("shortCode", "==", shortCode))
       const existingDocs = await getDocs(existingQuery)
 
-      while (!existingDocs.empty) {
-        shortCode = generateShortCode()
-        const newQuery = query(collection(db, "links"), where("shortCode", "==", shortCode))
-        const newDocs = await getDocs(newQuery)
-        if (newDocs.empty) break
+      if (!existingDocs.empty) {
+        if (useCustomUrl) {
+          toast({
+            title: "Hata!",
+            description: "Bu özel URL zaten kullanılıyor. Lütfen farklı bir URL deneyin.",
+            variant: "destructive",
+          })
+          setIsShortening(false)
+          return
+        } else {
+          // Otomatik kod için yeni kod üret
+          while (!existingDocs.empty) {
+            shortCode = generateShortCode()
+            const newQuery = query(collection(db, "links"), where("shortCode", "==", shortCode))
+            const newDocs = await getDocs(newQuery)
+            if (newDocs.empty) break
+          }
+        }
       }
 
-      await addDoc(collection(db, "links"), {
+      const linkData = {
         originalUrl: url,
         shortCode,
         createdBy: user.uid,
         createdByEmail: user.email,
         clicks: 0,
+        isCustom: useCustomUrl,
         createdAt: new Date(),
-      })
+      }
+
+      await addDoc(collection(db, "links"), linkData)
 
       const fullShortUrl = `${window.location.origin}/${shortCode}`
       setShortUrl(fullShortUrl)
+
+      // Discord'a yeni link bildirimi gönder
+      if (user.email) {
+        const embed = createNewLinkEmbed(user.email, url, shortCode, useCustomUrl, user.photoURL || undefined)
+        const message = `🔗 **${user.displayName || user.email}** yeni bir ${
+          useCustomUrl ? "özel" : "otomatik"
+        } link oluşturdu: \`${shortCode}\``
+        await sendDiscordBotMessage(embed, message)
+      }
+
+      // Form'u temizle
+      setUrl("")
+      setCustomUrl("")
+      setUseCustomUrl(false)
 
       toast({
         title: "Başarılı!",
@@ -104,6 +171,31 @@ export default function HomePage() {
       })
     } finally {
       setIsShortening(false)
+    }
+  }
+
+  const checkCustomUrlAvailability = async (customUrl: string) => {
+    if (!customUrl.trim() || !isValidCustomUrl(customUrl)) {
+      setCustomUrlError("")
+      return
+    }
+
+    setIsCheckingAvailability(true)
+    setCustomUrlError("")
+
+    try {
+      const q = query(collection(db, "links"), where("shortCode", "==", customUrl.toLowerCase()))
+      const querySnapshot = await getDocs(q)
+
+      if (!querySnapshot.empty) {
+        setCustomUrlError("Bu URL zaten kullanılıyor")
+      } else {
+        setCustomUrlError("")
+      }
+    } catch (error) {
+      console.error("Error checking availability:", error)
+    } finally {
+      setIsCheckingAvailability(false)
     }
   }
 
@@ -133,19 +225,132 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">LinkKısa</h1>
-          <p className="text-xl text-muted-foreground">
-            Uzun URL'lerinizi kısaltın ve tıklama istatistiklerini takip edin
+      <div className="max-w-4xl mx-auto">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Badge variant="outline" className="text-green-600 border-green-600">
+              <Github className="h-3 w-3 mr-1" />
+              Açık Kaynak
+            </Badge>
+            <Badge variant="outline" className="text-blue-600 border-blue-600">
+              <Shield className="h-3 w-3 mr-1" />
+              Güvenli
+            </Badge>
+            <Badge variant="outline" className="text-purple-600 border-purple-600">
+              <Zap className="h-3 w-3 mr-1" />
+              Hızlı
+            </Badge>
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LinkKısa</span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-muted-foreground mb-6">
+            Açık kaynak kodlu, güvenli ve ücretsiz URL kısaltma servisi
           </p>
+
+          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+            <Link
+              href="https://github.com/keremkk/link-shortener"
+              target="_blank"
+              className="flex items-center gap-2 hover:text-foreground transition-colors"
+            >
+              <Github className="h-4 w-4" />
+              GitHub'da İncele
+            </Link>
+            <span>•</span>
+            <Link href="/docs" className="hover:text-foreground transition-colors">
+              REST API
+            </Link>
+            <span>•</span>
+            <span>GPL Lisanslı</span>
+            <span>•</span>
+            <span>Topluluk Destekli</span>
+          </div>
         </div>
 
-        {!user ? (
+        {/* Features */}
+        <div className="grid md:grid-cols-4 gap-6 mb-12">
           <Card>
             <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Github className="h-5 w-5 text-green-600" />
+                Açık Kaynak
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Tüm kaynak kodlarımız GitHub'da açık. Şeffaflık ve güvenlik önceliğimiz.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-blue-600" />
+                Güvenli
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Firebase güvenliği, HTTPS şifreleme ve spam koruması ile verileriniz güvende.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-purple-600" />
+                Hızlı & Ücretsiz
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Hızlı yönlendirme, detaylı istatistikler ve tamamen ücretsiz kullanım.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Code className="h-5 w-5 text-indigo-600" />
+                REST API
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Programatik erişim için RESTful API. Token tabanlı kimlik doğrulama ve rate limiting.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* API Showcase */}
+        {user && (
+          <div className="max-w-4xl mx-auto mb-12">
+            <APIShowcase />
+          </div>
+        )}
+
+        {/* Quick Stats */}
+        {user && (
+          <div className="max-w-2xl mx-auto mb-12">
+            <QuickStats />
+          </div>
+        )}
+
+        {/* Main Content */}
+        {!user ? (
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader>
               <CardTitle>Başlamak için giriş yapın</CardTitle>
-              <CardDescription>URL kısaltma servisini kullanmak için Google hesabınızla giriş yapın</CardDescription>
+              <CardDescription>
+                Açık kaynak URL kısaltma servisini kullanmak için Google hesabınızla giriş yapın
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Button onClick={handleSignIn} className="w-full">
@@ -172,7 +377,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-2xl mx-auto">
             <Card>
               <CardHeader>
                 <CardTitle>URL Kısalt</CardTitle>
@@ -190,6 +395,59 @@ export default function HomePage() {
                   <Button onClick={handleShortenUrl} disabled={isShortening}>
                     {isShortening ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
                   </Button>
+                </div>
+
+                {/* Özel URL Seçeneği */}
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="useCustomUrl"
+                      checked={useCustomUrl}
+                      onChange={(e) => {
+                        setUseCustomUrl(e.target.checked)
+                        if (!e.target.checked) {
+                          setCustomUrl("")
+                          setCustomUrlError("")
+                        }
+                      }}
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor="useCustomUrl" className="text-sm font-medium">
+                      Özel kısa URL kullan
+                    </label>
+                  </div>
+
+                  {useCustomUrl && (
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
+                        <Input
+                          type="text"
+                          placeholder="ozel-url"
+                          value={customUrl}
+                          onChange={(e) => {
+                            const value = e.target.value.toLowerCase().replace(/[^a-z0-9\-_]/g, "")
+                            setCustomUrl(value)
+                            if (value.length >= 3) {
+                              checkCustomUrlAvailability(value)
+                            } else {
+                              setCustomUrlError("")
+                            }
+                          }}
+                          className={`flex-1 ${customUrlError ? "border-red-500" : ""}`}
+                          maxLength={20}
+                        />
+                        {isCheckingAvailability && <Loader2 className="h-4 w-4 animate-spin" />}
+                      </div>
+
+                      {customUrlError && <p className="text-sm text-red-500">{customUrlError}</p>}
+
+                      <p className="text-xs text-muted-foreground">
+                        Sadece harf, rakam, tire (-) ve alt çizgi (_) kullanabilirsiniz. 3-20 karakter arası.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {shortUrl && (
