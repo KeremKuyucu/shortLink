@@ -40,31 +40,6 @@ export function Footer() {
             </Link>
           </div>
         </div>
-
-        {/* Alt satır - Ek bilgiler */}
-        <div className="mt-4 pt-4 border-t border-border/40">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-4">
-              <span>Next.js ile geliştirildi</span>
-              <span>•</span>
-              <span>Firebase ile destekleniyor</span>
-              <span>•</span>
-              <span>Vercel'de barındırılıyor</span>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Link href="/docs" className="hover:text-foreground transition-colors">
-                API
-              </Link>
-              <Link href="/privacy" className="hover:text-foreground transition-colors">
-                Gizlilik
-              </Link>
-              <Link href="/terms" className="hover:text-foreground transition-colors">
-                Kullanım Şartları
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </footer>
   )

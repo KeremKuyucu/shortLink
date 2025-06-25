@@ -274,64 +274,6 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Github className="h-5 w-5 text-green-600" />
-                Açık Kaynak
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Tüm kaynak kodlarımız GitHub'da açık. Şeffaflık ve güvenlik önceliğimiz.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-600" />
-                Güvenli
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Firebase güvenliği, HTTPS şifreleme ve spam koruması ile verileriniz güvende.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-purple-600" />
-                Hızlı & Ücretsiz
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Hızlı yönlendirme, detaylı istatistikler ve tamamen ücretsiz kullanım.
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code className="h-5 w-5 text-indigo-600" />
-                REST API
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Programatik erişim için RESTful API. Token tabanlı kimlik doğrulama ve rate limiting.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Quick Stats */}
         {user && userPermission !== false && (
           <div className="max-w-2xl mx-auto mb-12">
