@@ -30,6 +30,7 @@ export default function AdminPage() {
   const [dataError, setDataError] = useState<string | null>(null)
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [processingBan, setProcessingBan] = useState<string | null>(null)
   const { toast } = useToast()
 
   // Admin yetkisi kontrolü
@@ -117,11 +118,19 @@ export default function AdminPage() {
   }, [user, isAdmin])
 
   const updateUserBanStatus = async (userId: string, isBanned: boolean) => {
+    if (processingBan) return // Prevent multiple simultaneous requests
+
     try {
+      setProcessingBan(userId)
       const userToUpdate = users.find((u) => u.id === userId)
 
+      console.log("Attempting to ban/unban user:", { userId, isBanned, userToUpdate })
+
+      // Firestore'da güncelle
       await updateDoc(doc(db, "users", userId), {
         isBanned,
+        updatedAt: new Date(),
+        updatedBy: user?.uid,
       })
 
       // Local state'i güncelle
@@ -131,13 +140,15 @@ export default function AdminPage() {
         title: "Başarılı!",
         description: `Kullanıcı ${isBanned ? "banlandı" : "ban kaldırıldı"}.`,
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error("User ban error:", error)
       toast({
         title: "Hata!",
-        description: "İşlem gerçekleştirilemedi.",
+        description: `İşlem gerçekleştirilemedi: ${error.message}`,
         variant: "destructive",
       })
+    } finally {
+      setProcessingBan(null)
     }
   }
 
@@ -318,8 +329,17 @@ export default function AdminPage() {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" onClick={() => updateUserBanStatus(userData.id, false)}>
-                      <UserCheck className="h-4 w-4 mr-1" />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => updateUserBanStatus(userData.id, false)}
+                      disabled={processingBan === userData.id}
+                    >
+                      {processingBan === userData.id ? (
+                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      ) : (
+                        <UserCheck className="h-4 w-4 mr-1" />
+                      )}
                       Ban Kaldır
                     </Button>
                   </div>
@@ -363,13 +383,31 @@ export default function AdminPage() {
                 {userData.role !== "superadmin" && (
                   <div className="flex space-x-2">
                     {userData.isBanned ? (
-                      <Button size="sm" variant="outline" onClick={() => updateUserBanStatus(userData.id, false)}>
-                        <UserCheck className="h-4 w-4 mr-1" />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updateUserBanStatus(userData.id, false)}
+                        disabled={processingBan === userData.id}
+                      >
+                        {processingBan === userData.id ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <UserCheck className="h-4 w-4 mr-1" />
+                        )}
                         Ban Kaldır
                       </Button>
                     ) : (
-                      <Button size="sm" variant="destructive" onClick={() => updateUserBanStatus(userData.id, true)}>
-                        <Ban className="h-4 w-4 mr-1" />
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => updateUserBanStatus(userData.id, true)}
+                        disabled={processingBan === userData.id}
+                      >
+                        {processingBan === userData.id ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Ban className="h-4 w-4 mr-1" />
+                        )}
                         Banla
                       </Button>
                     )}
