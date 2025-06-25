@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from "@/lib/firebase"
+<<<<<<< HEAD
 import { collection, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore"
+=======
+import { collection, query, where, getDocs, addDoc, doc, deleteDoc, updateDoc } from "firebase/firestore"
+>>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
 import { AuthGuard } from "@/components/auth-guard"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -32,6 +36,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
+<<<<<<< HEAD
 import {
   Key,
   Plus,
@@ -46,6 +51,9 @@ import {
   AlertTriangle,
   RefreshCw,
 } from "lucide-react"
+=======
+import { Key, Plus, Trash2, Copy, EyeOff, Eye, Activity, Settings, Calendar, Code, AlertTriangle } from "lucide-react"
+>>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
 import type { APIToken, APIPermission } from "@/types/api"
 import { APIIntegrationGuide } from "@/components/api-integration-guide"
 import Link from "next/link"
@@ -66,6 +74,7 @@ export default function TokensPage() {
   const [visibleTokens, setVisibleTokens] = useState<Set<string>>(new Set())
   const { toast } = useToast()
 
+<<<<<<< HEAD
   const fetchTokens = async () => {
     if (!user) return
 
@@ -88,6 +97,27 @@ export default function TokensPage() {
 
         // Client-side filtering
         if (data.userId === user.uid) {
+=======
+  useEffect(() => {
+    if (userLoading) return
+
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
+    const fetchTokens = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        const q = query(collection(db, "apiTokens"), where("userId", "==", user.uid))
+        const querySnapshot = await getDocs(q)
+        const tokensData: APIToken[] = []
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data()
+>>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
           tokensData.push({
             id: doc.id,
             ...data,
@@ -96,6 +126,7 @@ export default function TokensPage() {
             ...(data.expiresAt && { expiresAt: data.expiresAt.toDate() }),
             ...(data.lastUsed && { lastUsed: data.lastUsed.toDate() }),
           } as APIToken)
+<<<<<<< HEAD
         }
       })
 
@@ -124,6 +155,27 @@ export default function TokensPage() {
 
     fetchTokens()
   }, [user, userLoading])
+=======
+        })
+
+        tokensData.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        setTokens(tokensData)
+      } catch (error: any) {
+        console.error("Error fetching tokens:", error)
+        setError("Token'lar yüklenirken hata oluştu: " + (error.message || "Bilinmeyen hata"))
+        toast({
+          title: "Hata!",
+          description: "Token'lar yüklenirken hata oluştu.",
+          variant: "destructive",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTokens()
+  }, [user, userLoading, toast])
+>>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
 
   const generateAPIToken = () => {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -340,6 +392,7 @@ export default function TokensPage() {
                 <AlertTriangle className="h-12 w-12 text-red-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-red-800 mb-2">Veri Yükleme Hatası</h3>
                 <p className="text-red-600 mb-4">{error}</p>
+<<<<<<< HEAD
                 <div className="space-y-2">
                   <Button onClick={fetchTokens} className="w-full">
                     <RefreshCw className="h-4 w-4 mr-2" />
@@ -349,6 +402,9 @@ export default function TokensPage() {
                     Sayfayı Yenile
                   </Button>
                 </div>
+=======
+                <Button onClick={() => window.location.reload()}>Tekrar Dene</Button>
+>>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
               </div>
             </CardContent>
           </Card>
@@ -360,6 +416,7 @@ export default function TokensPage() {
   return (
     <AuthGuard>
       <div className="container mx-auto px-4 py-8">
+<<<<<<< HEAD
         {/* Debug Info */}
         {user && (
           <Card className="mb-4 border-blue-200 bg-blue-50">
@@ -371,6 +428,8 @@ export default function TokensPage() {
           </Card>
         )}
 
+=======
+>>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
