@@ -329,13 +329,6 @@ export default function HomePage() {
           </Card>
         </div>
 
-        {/* API Showcase */}
-        {user && (
-          <div className="max-w-4xl mx-auto mb-12">
-            <APIShowcase />
-          </div>
-        )}
-
         {/* Quick Stats */}
         {user && (
           <div className="max-w-2xl mx-auto mb-12">
@@ -467,6 +460,14 @@ export default function HomePage() {
             </Card>
           </div>
         )}
+
+        {/* API Showcase */}
+        {user && (
+          <div className="max-w-4xl mx-auto mb-12">
+            <APIShowcase />
+          </div>
+        )}
+        
       </div>
     </div>
   )
