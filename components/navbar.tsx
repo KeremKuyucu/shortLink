@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Link, LogOut, Settings, BarChart3 } from "lucide-react"
+import { Link, LogOut, Settings, BarChart3, Key, Code } from "lucide-react"
 import NextLink from "next/link"
 
 export function Navbar() {
@@ -56,6 +56,19 @@ export function Navbar() {
                       <p className="w-[200px] truncate text-sm text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/tokens">
+                      <Key className="mr-2 h-4 w-4" />
+                      <span>API Tokens</span>
+                    </NextLink>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <NextLink href="/docs">
+                      <Code className="mr-2 h-4 w-4" />
+                      <span>API Docs</span>
+                    </NextLink>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {isSuperAdmin(user.email) && (
                     <>

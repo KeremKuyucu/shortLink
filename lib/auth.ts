@@ -1,8 +1,8 @@
 import { auth, db } from "./firebase"
 import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth"
 import { doc, getDoc, setDoc } from "firebase/firestore"
-
-const SUPER_ADMIN_EMAIL = "kkuyucu2254@gmail.com"
+import { sendDiscordBotMessage, createNewUserEmbed } from "./discord"
+import { config } from "./config"
 
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider()
@@ -15,14 +15,23 @@ export const signInWithGoogle = async () => {
     const userDoc = await getDoc(userRef)
 
     if (!userDoc.exists()) {
-      await setDoc(userRef, {
+      const userData = {
         email: user.email,
         name: user.displayName,
         photoURL: user.photoURL,
-        isApproved: user.email === SUPER_ADMIN_EMAIL,
-        role: user.email === SUPER_ADMIN_EMAIL ? "superadmin" : "user",
+        isApproved: true, // Artık tüm kullanıcılar otomatik onaylı
+        isBanned: false, // Yeni ban field'ı
+        role: user.email === config.admin.superAdminEmail ? "superadmin" : "user",
         createdAt: new Date(),
-      })
+      }
+
+      await setDoc(userRef, userData)
+
+      // Discord'a yeni kullanıcı bildirimi gönder
+      if (user.email && user.displayName) {
+        const embed = createNewUserEmbed(user.email, user.displayName, user.photoURL || undefined)
+        await sendDiscordBotMessage(embed, `🎉 **${user.displayName}** sisteme katıldı!`)
+      }
     }
 
     return user
@@ -41,9 +50,45 @@ export const checkUserPermission = async (uid: string) => {
   if (!userDoc.exists()) return false
 
   const userData = userDoc.data()
-  return userData.isApproved || userData.email === SUPER_ADMIN_EMAIL
+  // Banlı kullanıcılar sistemi kullanamaz
+  if (userData.isBanned) return false
+
+  return userData.isApproved || userData.email === config.admin.superAdminEmail
 }
 
+// isSuperAdmin fonksiyonunu güncelle
 export const isSuperAdmin = (email: string | null) => {
-  return email === SUPER_ADMIN_EMAIL
+  if (!email) return false
+
+  // Environment variable'dan super admin email'i al
+  const superAdminEmail = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || config.admin.superAdminEmail
+
+  console.log("Admin check:", { email, superAdminEmail, match: email === superAdminEmail })
+
+  return email === superAdminEmail
+}
+
+// Yeni fonksiyon: Kullanıcının admin yetkisini kontrol et
+export const checkAdminPermission = async (uid: string, email: string | null) => {
+  // Önce super admin kontrolü
+  if (isSuperAdmin(email)) {
+    console.log("Super admin detected:", email)
+    return true
+  }
+
+  // Veritabanından kullanıcı rolünü kontrol et
+  try {
+    const userRef = doc(db, "users", uid)
+    const userDoc = await getDoc(userRef)
+
+    if (userDoc.exists()) {
+      const userData = userDoc.data()
+      console.log("User data from DB:", userData)
+      return userData.role === "superadmin" || userData.isAdmin === true
+    }
+  } catch (error) {
+    console.error("Admin permission check error:", error)
+  }
+
+  return false
 }

@@ -22,3 +22,39 @@ export function isValidUrl(string: string): boolean {
     return false
   }
 }
+
+export function isValidCustomUrl(customUrl: string): boolean {
+  // 3-20 karakter arası, sadece harf, rakam, tire ve alt çizgi
+  const regex = /^[a-zA-Z0-9\-_]{3,20}$/
+
+  // Yasaklı kelimeler (sistem sayfaları)
+  const reservedWords = [
+    "admin",
+    "api",
+    "www",
+    "mail",
+    "ftp",
+    "localhost",
+    "dashboard",
+    "login",
+    "register",
+    "signup",
+    "signin",
+    "auth",
+    "callback",
+    "settings",
+    "profile",
+    "account",
+    "help",
+    "support",
+    "about",
+    "contact",
+    "privacy",
+    "terms",
+    "legal",
+    "blog",
+    "news",
+  ]
+
+  return regex.test(customUrl) && !reservedWords.includes(customUrl.toLowerCase())
+}

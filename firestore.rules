@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - sadece kendi verilerini okuyabilir
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+    }
+    
+    // Links collection - sadece banlı olmayan kullanıcılar
+    match /links/{linkId} {
+      allow read, write: if request.auth != null && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isApproved == true &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isBanned != true;
+      
+      allow read: if request.auth != null && 
+        resource.data.createdBy == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isBanned != true;
+    }
+    
+    // API Tokens collection - sadece token sahibi erişebilir
+    match /apiTokens/{tokenId} {
+      allow read, write: if request.auth != null && 
+        resource.data.userId == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isApproved == true &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isBanned != true;
+      
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isApproved == true &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isBanned != true;
+    }
+    
+    // Public read için links (redirect için)
+    match /links/{linkId} {
+      allow read: if true; // Public read for redirects
+    }
+  }
+}

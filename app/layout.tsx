@@ -3,13 +3,28 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
 import { Toaster } from "@/components/ui/toaster"
+import { FirebaseErrorBoundary } from "@/components/firebase-error-boundary"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "LinkKısa - URL Kısaltma Servisi",
-  description: "Profesyonel URL kısaltma servisi",
+  description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
+  keywords: ["url kısaltma", "link kısaltma", "açık kaynak", "ücretsiz", "güvenli"],
+  authors: [{ name: "Kerem Kuyucu", url: "https://keremkk.com.tr" }],
+  openGraph: {
+    title: "LinkKısa - Açık Kaynak URL Kısaltma Servisi",
+    description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
+    type: "website",
+    locale: "tr_TR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LinkKısa - Açık Kaynak URL Kısaltma Servisi",
+    description: "Profesyonel URL kısaltma servisi - Açık kaynak kodlu, ücretsiz ve güvenli",
+  },
     generator: 'v0.dev'
 }
 
@@ -20,10 +35,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body className={inter.className}>
-        <Navbar />
-        <main>{children}</main>
-        <Toaster />
+      <body className={`${inter.className} min-h-screen flex flex-col`}>
+        <FirebaseErrorBoundary>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster />
+        </FirebaseErrorBoundary>
       </body>
     </html>
   )
