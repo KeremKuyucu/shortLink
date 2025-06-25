@@ -376,7 +376,7 @@ export default function DashboardPage() {
                           <div className="flex items-center space-x-2">
                             <span className="text-sm font-medium">Kısa:</span>
                             <code className="text-sm bg-muted px-2 py-1 rounded">
-                              {window.location.origin}/{link.shortCode}
+                              {`https://kisalink.icu/${link.shortCode}`}
                             </code>
                           </div>
 
