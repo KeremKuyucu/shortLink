@@ -32,7 +32,6 @@ export const signInWithGoogle = async () => {
         const embed = createNewUserEmbed(user.email, user.displayName, user.photoURL || undefined)
         await sendDiscordBotMessage(embed, `🎉 **${user.displayName}** sisteme katıldı!`)
       }
-<<<<<<< HEAD
     } else {
       // Mevcut kullanıcı için eksik field'ları güncelle
       const userData = userDoc.data()
@@ -48,8 +47,6 @@ export const signInWithGoogle = async () => {
       if (Object.keys(updates).length > 0) {
         await setDoc(userRef, updates, { merge: true })
       }
-=======
->>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
     }
 
     return user
@@ -68,7 +65,6 @@ export const checkUserPermission = async (uid: string) => {
 
     if (!userDoc.exists()) return true // Yeni kullanıcılar için izin ver
 
-<<<<<<< HEAD
     const userData = userDoc.data()
     // Sadece banlı kullanıcıları engelle
     return userData.isBanned !== true
@@ -76,13 +72,6 @@ export const checkUserPermission = async (uid: string) => {
     console.error("Permission check error:", error)
     return true // Hata durumunda izin ver
   }
-=======
-  const userData = userDoc.data()
-  // Banlı kullanıcılar sistemi kullanamaz
-  if (userData.isBanned) return false
-
-  return userData.isApproved || userData.email === config.admin.superAdminEmail
->>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
 }
 
 // isSuperAdmin fonksiyonunu güncelle
