@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useToast } from "@/hooks/use-toast"
 import { Ban, Users, Shield, Loader2, AlertTriangle, UserCheck } from "lucide-react"
-import { sendDiscordBotMessage, createUserBanEmbed } from "@/lib/discord"
 
 interface UserData {
   id: string
@@ -127,18 +126,6 @@ export default function AdminPage() {
 
       // Local state'i güncelle
       setUsers((prevUsers) => prevUsers.map((u) => (u.id === userId ? { ...u, isBanned } : u)))
-
-      // Discord'a ban durumu bildirimi gönder
-      if (userToUpdate) {
-        const embed = createUserBanEmbed(
-          userToUpdate.email,
-          userToUpdate.name,
-          isBanned,
-          userToUpdate.photoURL || undefined,
-        )
-        const message = `${isBanned ? "🚫" : "✅"} **${userToUpdate.name}** kullanıcısının ban durumu değiştirildi`
-        await sendDiscordBotMessage(embed, message)
-      }
 
       toast({
         title: "Başarılı!",
