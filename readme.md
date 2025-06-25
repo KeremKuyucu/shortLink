@@ -63,7 +63,7 @@ Modern, güvenli ve özellik açısından zengin bir link kısaltma servisi. Nex
 
 ### 1. Projeyi Klonlayın
 \`\`\`bash
-git clone https://github.com/yourusername/link-shortener.git
+git clone https://github.com/KeremKuyucu/shortLink.git
 cd link-shortener
 \`\`\`
 

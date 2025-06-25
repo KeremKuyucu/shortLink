@@ -253,7 +253,7 @@ export default function HomePage() {
 
           <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
             <Link
-              href="https://github.com/keremkk/link-shortener"
+              href="https://github.com/KeremKuyucu/shortLink"
               target="_blank"
               className="flex items-center gap-2 hover:text-foreground transition-colors"
             >
