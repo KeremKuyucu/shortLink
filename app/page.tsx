@@ -141,7 +141,7 @@ export default function HomePage() {
 
       await addDoc(collection(db, "links"), linkData)
 
-      const fullShortUrl = `${window.location.origin}/${shortCode}`
+      const fullShortUrl = `https://kisalink.icu/${shortCode}`
       setShortUrl(fullShortUrl)
 
       // Discord'a yeni link bildirimi gönder
