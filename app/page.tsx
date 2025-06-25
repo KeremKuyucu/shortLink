@@ -414,7 +414,7 @@ export default function HomePage() {
                   {useCustomUrl && (
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
+                        <span className="text-sm text-muted-foreground">https://kisalink.icu/</span>
                         <Input
                           type="text"
                           placeholder="ozel-url"
