@@ -498,13 +498,6 @@ export default function HomePage() {
           </div>
         ) : null}
 
-        {/* API Showcase */}
-        {user && userPermission !== false && (
-          <div className="max-w-4xl mx-auto mb-12">
-            <APIShowcase />
-          </div>
-        )}
-        
       </div>
     </div>
   )
