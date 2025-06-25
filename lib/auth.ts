@@ -1,7 +1,6 @@
 import { auth, db } from "./firebase"
 import { GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from "firebase/auth"
 import { doc, getDoc, setDoc } from "firebase/firestore"
-import { sendDiscordBotMessage, createNewUserEmbed } from "./discord"
 import { config } from "./config"
 
 export const signInWithGoogle = async () => {
@@ -24,14 +23,7 @@ export const signInWithGoogle = async () => {
         role: user.email === config.admin.superAdminEmail ? "superadmin" : "user",
         createdAt: new Date(),
       }
-
       await setDoc(userRef, userData)
-
-      // Discord'a yeni kullanıcı bildirimi gönder
-      if (user.email && user.displayName) {
-        const embed = createNewUserEmbed(user.email, user.displayName, user.photoURL || undefined)
-        await sendDiscordBotMessage(embed, `🎉 **${user.displayName}** sisteme katıldı!`)
-      }
     } else {
       // Mevcut kullanıcı için eksik field'ları güncelle
       const userData = userDoc.data()

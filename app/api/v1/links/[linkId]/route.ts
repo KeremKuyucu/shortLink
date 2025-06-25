@@ -105,40 +105,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { linkI
     // Link'i sil
     await linkDoc.ref.delete()
 
-    // Discord bildirimi
-    try {
-      const embed = {
-        title: "🗑️ Link Silindi (API)",
-        description: `API üzerinden bir link silindi`,
-        color: 0xff4444,
-        fields: [
-          {
-            name: "👤 Kullanıcı",
-            value: `\`${apiToken.userEmail}\``,
-            inline: true,
-          },
-          {
-            name: "🔗 Silinen Link",
-            value: `\`${linkData.shortCode}\``,
-            inline: true,
-          },
-          {
-            name: "📊 Toplam Tıklama",
-            value: `**${linkData.clicks || 0}** kez`,
-            inline: true,
-          },
-        ],
-        timestamp: new Date().toISOString(),
-        footer: {
-          text: "LinkKısa - API",
-        },
-      }
-
-      await sendDiscordBotMessage(embed, `🤖 **API ile** \`${linkData.shortCode}\` linki silindi`)
-    } catch (error) {
-      console.error("Discord notification failed:", error)
-    }
-
     await logAPIUsage(tokenId, `/api/v1/links/${params.linkId}`, "DELETE", 200)
     return NextResponse.json({
       success: true,

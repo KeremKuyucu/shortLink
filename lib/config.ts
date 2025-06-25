@@ -9,10 +9,6 @@ export const config = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   },
-  discord: {
-    botToken: process.env.DISCORD_BOT_TOKEN,
-    channelId: process.env.DISCORD_CHANNEL_ID,
-  },
   admin: {
     // Client-side'da da kullanabilmek için NEXT_PUBLIC_ prefix'i ekle
     superAdminEmail: process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || process.env.SUPER_ADMIN_EMAIL,
@@ -41,14 +37,6 @@ export function validateFirebaseAdminConfig() {
 
   if (missing.length > 0) {
     console.error(`Missing Firebase Admin configuration: ${missing.join(", ")}`)
-    return false
-  }
-  return true
-}
-
-export function validateDiscordConfig() {
-  if (!config.discord.botToken || !config.discord.channelId) {
-    console.warn("Discord configuration is incomplete. Bot features will be disabled.")
     return false
   }
   return true

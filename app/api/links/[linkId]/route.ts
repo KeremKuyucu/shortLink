@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase-admin"
-import { sendDiscordBotMessage } from "@/lib/discord"
 
 export async function DELETE(request: NextRequest, { params }: { params: { linkId: string } }) {
   try {
@@ -71,9 +70,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { linkI
         text: "LinkKısa - Link Yönetimi",
       },
     }
-
-    const message = `🗑️ **${linkData?.shortCode}** linki silindi (${linkData?.clicks || 0} tıklama)`
-    sendDiscordBotMessage(embed, message).catch(console.error)
 
     return NextResponse.json({ success: true, message: "Link başarıyla silindi" })
   } catch (error) {

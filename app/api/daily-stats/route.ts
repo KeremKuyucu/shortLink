@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase-admin"
-import { sendDiscordBotMessage, createDailyStatsEmbed } from "@/lib/discord"
 
 export async function POST() {
   try {
@@ -41,10 +40,6 @@ export async function POST() {
       totalClicks,
       clicksToday,
     }
-
-    // Discord'a günlük rapor gönder
-    const embed = createDailyStatsEmbed(stats)
-    await sendDiscordBotMessage(embed, "📊 **Günlük İstatistik Raporu**")
 
     return NextResponse.json({ success: true, stats })
   } catch (error) {

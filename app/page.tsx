@@ -11,7 +11,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { generateShortCode, isValidUrl } from "@/lib/utils"
-import { sendDiscordBotMessage, createNewLinkEmbed } from "@/lib/discord"
 import { Copy, LinkIcon, Loader2, Github, Shield, Zap, Code } from "lucide-react"
 import Link from "next/link"
 import { APIShowcase } from "@/components/api-showcase"
@@ -143,15 +142,6 @@ export default function HomePage() {
 
       const fullShortUrl = `https://kisalink.icu/${shortCode}`
       setShortUrl(fullShortUrl)
-
-      // Discord'a yeni link bildirimi gönder
-      if (user.email) {
-        const embed = createNewLinkEmbed(user.email, url, shortCode, useCustomUrl, user.photoURL || undefined)
-        const message = `🔗 **${user.displayName || user.email}** yeni bir ${
-          useCustomUrl ? "özel" : "otomatik"
-        } link oluşturdu: \`${shortCode}\``
-        await sendDiscordBotMessage(embed, message)
-      }
 
       // Form'u temizle
       setUrl("")

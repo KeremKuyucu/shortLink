@@ -1,6 +1,5 @@
 import { redirect, notFound } from "next/navigation"
 import { adminDb } from "@/lib/firebase-admin"
-import { sendDiscordBotMessage, createLinkClickEmbed } from "@/lib/discord"
 import { headers } from "next/headers"
 
 interface RedirectPageProps {
@@ -84,11 +83,6 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
         clicks: newClickCount,
         lastClickedAt: new Date(),
       })
-
-      // Discord'a tıklama bildirimi gönder (async, redirect'i bloklamadan)
-      const embed = createLinkClickEmbed(shortCode, linkData.originalUrl, newClickCount, userAgent, ipAddress)
-      const message = `👆 **${shortCode}** linki tıklandı! (${newClickCount}. tıklama)`
-      sendDiscordBotMessage(embed, message).catch(console.error)
     } else {
       // Bot/Preview isteği - sadece log
       console.log(`Bot/Preview request detected for ${shortCode}:`, {

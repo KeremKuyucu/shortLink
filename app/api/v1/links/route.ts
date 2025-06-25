@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase-admin"
 import { validateAPIToken, hasPermission, logAPIUsage, APIAuthError } from "@/lib/api-auth"
 import { generateShortCode, isValidUrl, isValidCustomUrl } from "@/lib/utils"
-import { sendDiscordBotMessage, createNewLinkEmbed } from "@/lib/discord"
 import type { APIResponse, CreateLinkRequest, CreateLinkResponse } from "@/types/api"
 
 export async function POST(request: NextRequest) {
@@ -79,15 +78,6 @@ export async function POST(request: NextRequest) {
 
     const linkRef = await adminDb.collection("links").add(linkData)
     const shortUrl = `${request.nextUrl.origin}/${shortCode}`
-
-    // Discord bildirimi
-    try {
-      const embed = createNewLinkEmbed(apiToken.userEmail, originalUrl, shortCode, !!customUrl, undefined)
-      const message = `🤖 **API ile** yeni ${customUrl ? "özel" : "otomatik"} link oluşturuldu: \`${shortCode}\``
-      await sendDiscordBotMessage(embed, message)
-    } catch (error) {
-      console.error("Discord notification failed:", error)
-    }
 
     const response: CreateLinkResponse = {
       id: linkRef.id,
