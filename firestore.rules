@@ -3,11 +3,14 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Users collection - sadece kendi verilerini okuyabilir
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin';
+      allow read: if request.auth != null && (
+        request.auth.uid == userId ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin')
+      );
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
+
     
     // Helper function to check user status
     function isUserAllowed() {
@@ -17,18 +20,9 @@ service cloud.firestore {
              userDoc.data.isBanned != true;
     }
     
-<<<<<<< HEAD
     // Links collection - authenticated users can access
     match /links/{linkId} {
       allow read, write, list: if request.auth != null;
-=======
-    // Links collection - sadece banlı olmayan kullanıcılar
-    match /links/{linkId} {
-      allow read, write, list: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        isUserAllowed();
-      
->>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
       allow read: if request.auth != null && 
         resource.data.createdBy == request.auth.uid;
     }
@@ -36,7 +30,6 @@ service cloud.firestore {
     // API Tokens collection - sadece token sahibi erişebilir
     match /apiTokens/{tokenId} {
       allow read, write: if request.auth != null && 
-<<<<<<< HEAD
         resource.data.userId == request.auth.uid;
       
       allow create: if request.auth != null && 
@@ -44,21 +37,6 @@ service cloud.firestore {
         
       // Collection query için list permission
       allow list: if request.auth != null;
-=======
-        resource.data.userId == request.auth.uid &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        isUserAllowed();
-      
-      allow create: if request.auth != null && 
-        request.resource.data.userId == request.auth.uid &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        isUserAllowed();
-        
-      // Collection query için list permission
-      allow list: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        isUserAllowed();
->>>>>>> 5c5b36df51964fda8c0391a178f607c2b08f1c0d
     }
     
     // Public read için links (redirect için)
