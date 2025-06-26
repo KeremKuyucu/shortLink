@@ -164,8 +164,7 @@ export default function DashboardPage() {
   }, [user])
 
   const copyToClipboard = async (shortCode: string) => {
-    const fullUrl = `https://kisalink.icu/
-${shortCode}`
+    const fullUrl = `https://kisalink.icu/${shortCode}`
     try {
       await navigator.clipboard.writeText(fullUrl)
       toast({
