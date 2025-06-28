@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { useAuthState } from "react-firebase-hooks/auth"
 import { auth, db } from "@/lib/firebase"
@@ -16,6 +15,7 @@ import Link from "next/link"
 import { APIShowcase } from "@/components/api-showcase"
 import { QuickStats } from "@/components/quick-stats"
 import { useEffect } from "react"
+import { sendAnalyticsEvent } from "@/lib/analytics";
 
 export default function HomePage() {
   const [user, loading] = useAuthState(auth)
@@ -29,15 +29,30 @@ export default function HomePage() {
   const [useCustomUrl, setUseCustomUrl] = useState(false)
   const [isCheckingAvailability, setIsCheckingAvailability] = useState(false)
   const [customUrlError, setCustomUrlError] = useState("")
+  const [hasSentPageView, setHasSentPageView] = useState(false);
 
-  // Kullanıcı izinlerini kontrol et
+  // ... diğer state'leriniz ...
+
   useEffect(() => {
-    if (user) {
-      checkUserPermission(user.uid).then(setUserPermission)
-    } else {
-      setUserPermission(null)
+    if (loading) {
+      return;
     }
-  }, [user])
+    if (!hasSentPageView) {
+      sendAnalyticsEvent(
+        '/page/view',
+        user ? user.uid : 'hesapsız',
+        {
+          path: window.location.pathname, 
+        }
+      );
+      setHasSentPageView(true); 
+    }
+    if (user) {
+      checkUserPermission(user.uid).then(setUserPermission);
+    } else {
+      setUserPermission(null);
+    }
+  }, [user, loading, hasSentPageView]);
 
   const handleSignIn = async () => {
     try {

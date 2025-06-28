@@ -26,14 +26,6 @@ try {
   console.log("✅ Firebase Admin initialized successfully")
 } catch (error) {
   console.error("❌ Firebase Admin initialization failed:", error)
-
-  // Development ortamında daha detaylı hata
-  if (process.env.NODE_ENV === "development") {
-    console.error("Make sure you have set the following environment variables:")
-    console.error("- FIREBASE_PROJECT_ID")
-    console.error("- FIREBASE_CLIENT_EMAIL")
-    console.error("- FIREBASE_PRIVATE_KEY")
-  }
 }
 
 export { adminDb }

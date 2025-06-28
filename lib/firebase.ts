@@ -29,18 +29,6 @@ try {
 } catch (error) {
   console.error("❌ Firebase Client initialization failed:", error)
 
-  // Development ortamında daha detaylı hata
-  if (process.env.NODE_ENV === "development") {
-    console.error("Make sure you have set the following environment variables:")
-    console.error("- NEXT_PUBLIC_FIREBASE_API_KEY")
-    console.error("- NEXT_PUBLIC_FIREBASE_PROJECT_ID")
-    console.error("- NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN (optional)")
-    console.error("- NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET (optional)")
-    console.error("- NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID (optional)")
-    console.error("- NEXT_PUBLIC_FIREBASE_APP_ID (optional)")
-    console.error("- NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID (optional)")
-  }
-
   // Fallback değerler (sadece development için)
   if (process.env.NODE_ENV === "development") {
     console.warn("⚠️ Using fallback Firebase configuration for development")
