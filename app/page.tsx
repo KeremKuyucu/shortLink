@@ -41,9 +41,6 @@ export default function HomePage() {
       sendAnalyticsEvent(
         '/page/view',
         user ? user.uid : 'hesapsız',
-        {
-          path: window.location.pathname, 
-        }
       );
       setHasSentPageView(true); 
     }
