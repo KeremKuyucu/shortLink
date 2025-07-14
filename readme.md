@@ -10,7 +10,6 @@ Modern, güvenli ve özellik açısından zengin bir link kısaltma servisi. Nex
 
   - **Link Kısaltma**: Uzun URL'leri kısa, paylaşılabilir linklere dönüştürün.
   - **Özel Kısa Kodlar**: İstediğiniz kısa kodu belirleme imkanı.
-  - **QR Kod Üretimi**: Her kısa link için otomatik QR kod oluşturma.
   - **Tıklama İstatistikleri**: Detaylı analitik ve raporlama.
   - **Duyarlı Tasarım (Responsive)**: Tüm cihazlarda sorunsuz kullanım deneyimi.
 
