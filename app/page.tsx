@@ -63,7 +63,7 @@ export default function HomePage() {
     }
       sendAnalyticsEvent(
         '/page/view',
-        user ? user.uid : 'unknow',
+        user ? user.uid : 'unknown',
       );
   }
 
