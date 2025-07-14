@@ -38,10 +38,6 @@ export default function HomePage() {
       return;
     }
     if (!hasSentPageView) {
-      sendAnalyticsEvent(
-        '/page/view',
-        user ? user.uid : 'hesapsız',
-      );
       setHasSentPageView(true); 
     }
     if (user) {
@@ -65,6 +61,10 @@ export default function HomePage() {
         variant: "destructive",
       })
     }
+      sendAnalyticsEvent(
+        '/page/view',
+        user ? user.uid : 'unknow',
+      );
   }
 
   const isValidCustomUrl = (url: string) => {
