@@ -50,21 +50,25 @@ export default function HomePage() {
   const handleSignIn = async () => {
     try {
       await signInWithGoogle()
+      sendAnalyticsEvent(
+        '/page/view',
+        user ? user.uid : 'unknown',
+      );
       toast({
         title: "Başarılı!",
         description: "Google ile giriş yapıldı.",
       })
     } catch (error) {
+      sendAnalyticsEvent(
+        '/page/view',
+        user ? user.uid : 'unknown',
+      );
       toast({
         title: "Hata!",
         description: "Giriş yapılırken bir hata oluştu.",
         variant: "destructive",
       })
     }
-      sendAnalyticsEvent(
-        '/page/view',
-        user ? user.uid : 'unknown',
-      );
   }
 
   const isValidCustomUrl = (url: string) => {
