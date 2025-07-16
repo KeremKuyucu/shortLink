@@ -42,6 +42,10 @@ export default function HomePage() {
     }
     if (user) {
       checkUserPermission(user.uid).then(setUserPermission);
+      sendAnalyticsEvent(
+        '/page/view',
+        user ? user.uid : 'unknown',
+      );
     } else {
       setUserPermission(null);
     }
@@ -50,19 +54,11 @@ export default function HomePage() {
   const handleSignIn = async () => {
     try {
       await signInWithGoogle()
-      sendAnalyticsEvent(
-        '/page/view',
-        user ? user.uid : 'unknown',
-      );
       toast({
         title: "Başarılı!",
         description: "Google ile giriş yapıldı.",
       })
     } catch (error) {
-      sendAnalyticsEvent(
-        '/page/view',
-        user ? user.uid : 'unknown',
-      );
       toast({
         title: "Hata!",
         description: "Giriş yapılırken bir hata oluştu.",
