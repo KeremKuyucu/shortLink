@@ -31,25 +31,22 @@ export default function HomePage() {
   const [customUrlError, setCustomUrlError] = useState("")
   const [hasSentPageView, setHasSentPageView] = useState(false);
 
-  // ... diğer state'leriniz ...
-
   useEffect(() => {
-    if (loading) {
-      return;
-    }
-    if (!hasSentPageView) {
-      setHasSentPageView(true); 
-    }
-    if (user) {
-      checkUserPermission(user.uid).then(setUserPermission);
+    if (!loading) {
       sendAnalyticsEvent(
         '/page/view',
         user ? user.uid : 'unknown',
       );
+    }
+  }, [loading, user]); 
+
+  useEffect(() => {
+    if (user) {
+      checkUserPermission(user.uid).then(setUserPermission);
     } else {
       setUserPermission(null);
     }
-  }, [user, loading, hasSentPageView]);
+  }, [user]);
 
   const handleSignIn = async () => {
     try {
