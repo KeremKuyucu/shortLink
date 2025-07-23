@@ -256,7 +256,7 @@ export default function APIDocsPage() {
               <h3 className="font-medium mb-2">3. Entegre Et</h3>
               <p className="text-sm text-muted-foreground mb-3">Uygulamanıza entegre edin</p>
               <Button asChild size="sm" variant="outline">
-                <Link href="https://github.com/keremkk/shortLink/wiki/API" target="_blank">
+                <Link href="https://github.com/keremkuyucu/shortLink/wiki/API" target="_blank">
                   GitHub Wiki
                 </Link>
               </Button>
