@@ -138,38 +138,6 @@ export default function APIDocsPage() {
         },
       },
     },
-    {
-      method: "POST",
-      path: "/api/v1/tokens",
-      title: "Token Oluştur",
-      description: "Yeni API token oluşturur",
-      permissions: ["tokens:create"],
-      requestBody: {
-        name: "string (required) - Token adı",
-        permissions: "array (required) - Token yetkileri",
-        rateLimit: "number (optional) - Saatlik limit (default: 100)",
-        expiresAt: "string (optional) - Son kullanma tarihi",
-      },
-      response: {
-        success: true,
-        data: {
-          id: "token_id",
-          name: "My API Token",
-          token: "lks_abc123...",
-          permissions: [
-            {
-              resource: "links",
-              actions: ["create", "read"],
-            },
-          ],
-          rateLimit: 100,
-          usageCount: 0,
-          isActive: true,
-          createdAt: "2024-01-01T00:00:00.000Z",
-        },
-        message: "Token created successfully. Save it securely - you won't see it again!",
-      },
-    },
   ]
 
   const errorCodes = [
