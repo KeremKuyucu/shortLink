@@ -72,9 +72,7 @@ export const isSuperAdmin = (email: string | null) => {
 
   // Environment variable'dan super admin email'i al
   const superAdminEmail = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || config.admin.superAdminEmail
-
-  console.log("Admin check:", { email, superAdminEmail, match: email === superAdminEmail })
-
+  
   return email === superAdminEmail
 }
 
