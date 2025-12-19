@@ -110,10 +110,6 @@ FIREBASE_PROJECT_ID=your_project_id
 FIREBASE_CLIENT_EMAIL=your_service_account_email
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 
-# Discord Entegrasyonu
-DISCORD_BOT_TOKEN=your_bot_token
-DISCORD_CHANNEL_ID=your_channel_id
-
 # Yönetici (Admin) Konfigürasyonu
 NEXT_PUBLIC_SUPER_ADMIN_EMAIL=admin@example.com
 SUPER_ADMIN_EMAIL=admin@example.com
